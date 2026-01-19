@@ -1,0 +1,22 @@
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Python compiled files
+__pycache__/
+*.pyc
+
+# Environment variables
+.env
+
+# Logs and temporary files
+logs/
+temp_downloads/
+debug_output.json
+*_results.json
+*_output.txt
+
+# Editor/IDE
+.vscode/
+.idea/
