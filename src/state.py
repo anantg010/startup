@@ -28,6 +28,8 @@ class RawGatheringData(BaseModel):
     pitch_deck_extracted: Optional[ExtractedPitchDeck] = Field(None, description="Data from pitch deck")
     website_scraped: Optional[ScrapedWebsiteData] = Field(None, description="Data from website")
     search_results: Optional[SerpAPIResults] = Field(None, description="Search results")
+    tavily_report: Optional[str] = Field(None, description="Markdown report from Tavily Research")
+    tavily_data: Optional[Dict] = Field(None, description="Raw JSON data from Tavily")
 
 
 # ==================== Founder Profile Model ====================

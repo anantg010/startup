@@ -54,13 +54,20 @@ async def analyze_competitors_node(state: GraphState) -> dict:
         business_model = research_findings.company_goal or "Not specified"
 
         focus_market = research_findings.customer_base or "Not specified"
-        known_competitors = ", ".join(research_findings.known_competitors) if research_findings.known_competitors else "None identified"
+        known_competitors = ", ".join(research_findings.known_competitors) if research_findings.known_competitors else ""
+        
+        # Extract Tavily report for context
+        tavily_report = ""
+        raw_data = state.raw_gathering_data
+        if raw_data and raw_data.tavily_report:
+            tavily_report = raw_data.tavily_report
+            print(f"✓ Tavily Report available for context ({len(tavily_report)} chars)")
         
         print(f"✓ Startup: {startup_name}")
         print(f"✓ Industry: {industry}")
         print(f"✓ Business Model: {business_model}")
         print(f"✓ Focus Market: {focus_market}")
-        print(f"✓ Known Competitors: {known_competitors}")
+        print(f"✓ Known Competitors: {known_competitors if known_competitors else 'None identified explicitly'}")
         
         # Step 2: Create competitor analysis prompt
         print("\n  Creating competitor analysis prompt...")
@@ -82,7 +89,12 @@ IMPORTANT GEOGRAPHIC FOCUS:
 2. **GLOBAL FALLBACK**: Only if you cannot find sufficient competitors in the Indian market, then identify competitors from other markets (US, Europe, Asia, etc.)
 3. **PREFERENCE ORDER**: India-based > India-focused > Global players with India presence > Global competitors
 
-KNOWN COMPETITORS FROM DATA:
+RAW RESEARCH CONTEXT (TAVILY REPORT):
+--------------------------------
+{tavily_context}
+--------------------------------
+
+KNOWN COMPETITORS FROM ANALYSIS:
 {known_competitors}
 
 Your task:
@@ -151,7 +163,8 @@ Be specific with numbers and factual. If exact data is unknown, provide realisti
             "business_model": business_model,
             "focus_market": focus_market,
             "known_competitors": known_competitors,
-            "description": research_findings.description
+            "description": research_findings.description,
+            "tavily_context": tavily_report if tavily_report else "No deep research report available."
         })
         
         print("  ✓ LLM analysis completed")

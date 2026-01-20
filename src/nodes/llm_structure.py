@@ -129,6 +129,14 @@ WEBSITE CONTENT
 SEARCH RESULTS (Comprehensive)
 ==============================
 {json.dumps(search_results, indent=2) if search_results else 'No search results available'}
+
+TAVILY DEEP RESEARCH REPORT
+===========================
+{raw_gathering_data.tavily_report if raw_gathering_data.tavily_report else 'No deep research report available'}
+
+TAVILY RAW DATA (Source Details)
+================================
+{json.dumps(raw_gathering_data.tavily_data, indent=2) if raw_gathering_data.tavily_data else 'No raw data available'}
 """
         
         print("  ✓ Context built successfully")
@@ -236,7 +244,7 @@ Please provide a comprehensive analysis and structure the information into the f
 46. som - Serviceable Obtainable Market in INR (number, null if unknown)
 47. market_growth_rate - Market growth rate percentage (number, null if unknown)
 48. competitive_landscape - Detailed competitive analysis (5-7 sentences)
-49. known_competitors - List of specific competitor names mentioned in the source documents or clearly identifiable (array of strings)
+49. known_competitors - List of specific competitor names mentioned in the "Tavily Deep Research Report" or Pitch Deck (array of strings). Extract AS MANY AS POSSIBLE.
 
 === ADDITIONAL INFO ===
 50. partnerships - List of notable partnerships

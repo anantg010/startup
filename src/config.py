@@ -34,6 +34,7 @@ class Config:
     SEARCH_API_PROVIDER = os.getenv("SEARCH_API_PROVIDER", "serper")  # Options: "serper", "serpapi", "google"
     SERPER_API_KEY = os.getenv("SERPER_API_KEY")  # If using Serper
     SERPAPI_API_KEY = os.getenv("SERPAPI_API_KEY")  # If using SerpAPI
+    TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")  # If using Tavily
     
     # ==================== LangSmith Configuration ====================
     LANGSMITH_API_KEY = os.getenv("LANGSMITH_API_KEY")
