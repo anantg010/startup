@@ -389,6 +389,18 @@ async def generate_investment_thesis_node(state: GraphState) -> dict:
         
         elements.append(Spacer(1, 0.3*inch))
         
+        # ==================== L1 CALL RECOMMENDATION ====================
+        if ai_scorecard and ai_scorecard.investment_recommendation:
+             elements.append(Paragraph("<b>L1 Call Recommendation:</b>", subheading_style))
+             
+             rec_text = ai_scorecard.investment_recommendation.replace("_", " ")
+             elements.append(Paragraph(rec_text, ParagraphStyle('L1Rec', fontSize=12, leftIndent=15, textColor=colors.black, fontName='Helvetica-Bold')))
+             
+             elements.append(Spacer(1, 0.1*inch))
+             elements.append(Paragraph("<b>Refer below for detailed summary</b>", ParagraphStyle('ReferText', fontSize=10, alignment=TA_CENTER, textColor=colors.black, fontName='Arial-Bold', spaceAfter=10)))
+        
+        elements.append(Spacer(1, 0.2*inch))
+        
         # ==================== KEY DETAILS SECTION (Commented Out) ====================
         '''
         elements.append(Paragraph("Key Details", heading_style))
@@ -928,15 +940,7 @@ async def generate_investment_thesis_node(state: GraphState) -> dict:
             elements.append(Spacer(1, 0.2*inch))
         '''
         
-        # ==================== L1 CALL RECOMMENDATION ====================
-        if ai_scorecard and ai_scorecard.investment_recommendation:
-             elements.append(Spacer(1, 0.15*inch))
-             elements.append(Paragraph("<b>L1 Call Recommendation:</b>", subheading_style))
-             
-             rec_text = ai_scorecard.investment_recommendation.replace("_", " ")
-             elements.append(Paragraph(rec_text, ParagraphStyle('L1Rec', fontSize=12, leftIndent=15, textColor=colors.black, fontName='Helvetica-Bold')))
-        
-        
+
         # Step 7: Build PDF
         doc.build(elements)
         
@@ -967,6 +971,11 @@ async def generate_investment_thesis_node(state: GraphState) -> dict:
         print(f"\\n❌ ERROR in Node 6: {str(e)}")
         import traceback
         traceback.print_exc()
+        
+        with open("pdf_error.txt", "w", encoding="utf-8") as f:
+            f.write(f"PDF Gen Error: {str(e)}\n\n")
+            traceback.print_exc(file=f)
+
         print("="*60 + "\\n")
         
         return {

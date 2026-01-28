@@ -259,6 +259,11 @@ async def research_startup(
         import traceback
         traceback.print_exc()
         
+        # Log to file for debugging
+        with open("error_log.txt", "w", encoding="utf-8") as f:
+            f.write(f"Error: {str(e)}\n\n")
+            traceback.print_exc(file=f)
+        
         print("\n" + "="*60)
         print("❌ REQUEST FAILED WITH EXCEPTION")
         print("="*60 + "\n")
