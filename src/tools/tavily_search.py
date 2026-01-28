@@ -73,9 +73,10 @@ class TavilySearch:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
-    async def run_deep_research(self, query: str, poll_interval: int = 5) -> Dict:
+    async def run_deep_research(self, query: str, poll_interval: int = 40) -> Dict:
         """
         Run deep research and wait for results (Polling)
+        poll_interval: seconds to wait between checks (default 40s)
         """
         # 1. Start Research
         task = await self.create_research_task(query)
@@ -89,7 +90,9 @@ class TavilySearch:
         print(f"  ✓ Task Started (ID: {request_id})")
         
         # 2. Poll for completion
-        max_retries = 60  # Wait up to 5 minutes (60 * 5s)
+        # User requested timeout increase to ~700s
+        # 700s / 40s = 17.5 -> 18 retries (720s total)
+        max_retries = 18  
         
         for i in range(max_retries):
             status_res = await self.get_research_status(request_id)

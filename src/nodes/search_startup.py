@@ -25,6 +25,8 @@ async def search_startup_node(state: GraphState) -> dict:
         # Step 1: Get startup information
         startup_name = state.startup_data.name
         industry = state.startup_data.industry or ""
+        legal_name = state.startup_data.legal_name or ""
+        website = state.startup_data.website or ""
         
         if not startup_name:
             print("⚠️ No startup name provided")
@@ -47,14 +49,14 @@ async def search_startup_node(state: GraphState) -> dict:
             
             # Construct a comprehensive query
             research_query = f"""
-            Analyze the startup "{startup_name}" in the {industry} industry. 
+            Analyze the startup "{startup_name}" (Legal Name: "{legal_name}") in the {industry} industry. 
+            Website: {website}
             Find detailed information about:
-            1. Founders and their backgrounds (education, previous companies)
-            2. Product details, features, and unique value proposition
-            3. Business model, pricing, and revenue streams
-            4. Funding history, investors, and amount raised
-            5. Market size, target audience, and competitors
-            6. Traction, customer reviews, and news
+            1. Founders and their backgrounds
+            2. Business model, pricing, and revenue streams
+            3. Funding history, investors, and amount raised
+            4. Market size, target audience, and competitors
+            5. Traction, customer reviews, and news
             """
             
             tavily_result = await tavily_tool.run_deep_research(research_query.strip())

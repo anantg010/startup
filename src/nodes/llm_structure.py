@@ -207,7 +207,7 @@ Please provide a comprehensive analysis and structure the information into the f
 17. company_goal - Company's main goal and vision (detailed, 3-5 sentences)
 18. employee_count - Number of employees (integer)
 19. company_info - Company background as object/dict
-20. team_insights - Detailed team background analysis (3-5 sentences)
+20. team_insights - Brief team size information ONLY (e.g., "Team of 15 employees", "Founded by 2 people"). Do NOT include founder bios or generic team descriptions. If size is unknown, return null.
 
 === PRODUCT & BUSINESS ===
 21. product_description - Detailed product/service description (5-7 sentences)
@@ -219,11 +219,11 @@ Please provide a comprehensive analysis and structure the information into the f
 27. technology_stack - Technologies used
 
 === FINANCIAL METRICS ===
-28. funding_raised - Total funding raised in INR (number, null if unknown)
-29. funding_ask_amount - Current funding ask in INR (number, null if unknown)
+28. funding_raised - Total funding raised in Indian Rupees (INR) (number, null if unknown)
+29. funding_ask_amount - Current funding ask in Indian Rupees (INR) (number, null if unknown)
 30. funding_info - Funding history as object/dict
-31. current_mrr - Monthly Recurring Revenue in INR (number, null if unknown)
-32. current_arr - Annual Recurring Revenue in INR (number, null if unknown)
+31. current_mrr - Monthly Recurring Revenue in Indian Rupees (INR) (number, null if unknown)
+32. current_arr - Annual Recurring Revenue in Indian Rupees (INR) (number, null if unknown)
 33. yoy_growth_rate - Year over year growth rate percentage (number, null if unknown)
 34. customer_acquisition_cost - CAC in INR (number, null if unknown)
 35. lifetime_value - LTV in INR (number, null if unknown)
@@ -239,11 +239,11 @@ Please provide a comprehensive analysis and structure the information into the f
 
 === MARKET ANALYSIS ===
 43. market_analysis - Detailed market opportunity analysis (5-7 sentences)
-44. tam - Total Addressable Market in INR (number, null if unknown)
-45. sam - Serviceable Addressable Market in INR (number, null if unknown)
-46. som - Serviceable Obtainable Market in INR (number, null if unknown)
+44. tam - Total Addressable Market in INR (number). IF ACTUAL DATA MISSING, YOU MUST ESTIMATE using industry standards. Do NOT return null.
+45. sam - Serviceable Addressable Market in INR (number). IF ACTUAL DATA MISSING, YOU MUST ESTIMATE using industry standards. Do NOT return null.
+46. som - Serviceable Obtainable Market in INR (number). IF ACTUAL DATA MISSING, YOU MUST ESTIMATE using industry standards. Do NOT return null.
 47. market_growth_rate - Market growth rate percentage (number, null if unknown)
-48. competitive_landscape - Detailed competitive analysis (5-7 sentences)
+
 49. known_competitors - List of specific competitor names mentioned in the "Tavily Deep Research Report" or Pitch Deck (array of strings). Extract AS MANY AS POSSIBLE.
 
 === ADDITIONAL INFO ===
@@ -319,14 +319,12 @@ Please provide a comprehensive analysis and structure the information into the f
 
     Also provide:
     - overall_score: Weighted average of all scores (calculate using weights)
-    - investment_recommendation: Based on overall_score:
-      * "STRONG_BUY" if >= 8.0
-      * "BUY" if >= 6.5
-      * "HOLD" if >= 5.0
-      * "PASS" if < 5.0
+    - investment_recommendation: The decision on whether to initiate an L1 call with the founders:
+      * "INITIATE_L1_CALL" if overall_score >= 6.5 (Startup has potential and is not rejected instantly)
+      * "DO_NOT_INITIATE_L1_CALL" if overall_score < 6.5 (Startup rejected or lacks sufficient potential)
     - investment_summary: 3-5 sentence advisory summary for investors (focus on advice/recommendation rather than just description)
     - key_risks: Top 5 risks to monitor
-    - key_opportunities: Top 5 opportunities for growth
+    - key_opportunities: A list of 3-4 specific, actionable opportunities that act as strategic advice for startup evaluators. These should NOT be generic (e.g., "growing market"). Instead, provide detailed insights or strategic moves the startup could take (e.g., "Leverage proprietary dataset to build predictive maintenance models for Tier 2 manufacturing clients"). Explanations can be detailed and don't need to be short.
 
 IMPORTANT INSTRUCTIONS:
 - Return ONLY valid JSON
@@ -424,7 +422,7 @@ JSON Response:
                                        "lifetime_value", "burn_rate", "runway_months"],
                 "TRACTION & METRICS": ["total_customers", "active_users", "retention_rate", "key_metrics", "customer_base"],
                 "TRACTION & METRICS": ["total_customers", "active_users", "retention_rate", "key_metrics", "customer_base"],
-                "MARKET_ANALYSIS": ["market_analysis", "tam", "sam", "som", "market_growth_rate", "competitive_landscape", "known_competitors"],
+                "MARKET_ANALYSIS": ["market_analysis", "tam", "sam", "som", "market_growth_rate", "known_competitors"],
                 "ADDITIONAL_INFO": ["partnerships", "awards_recognition", "news_mentions", "social_presence"],
                 "ADDITIONAL_INFO": ["partnerships", "awards_recognition", "news_mentions", "social_presence"],
                 "INVESTMENT_ANALYSIS": ["investment_highlights", "risk_factors"],
@@ -564,7 +562,7 @@ JSON Response:
             financials_score=create_score_detail(scorecard_data.get("financials_score"), 0.10),
             competition_score=create_score_detail(scorecard_data.get("competition_score"), 0.10),
             overall_score=float(scorecard_data.get("overall_score", 0)),
-            investment_recommendation=scorecard_data.get("investment_recommendation", "HOLD"),
+            investment_recommendation=scorecard_data.get("investment_recommendation", "DO_NOT_INITIATE_L1_CALL"),
             investment_summary=scorecard_data.get("investment_summary", ""),
             key_risks=scorecard_data.get("key_risks", []) if isinstance(scorecard_data.get("key_risks"), list) else [],
             key_opportunities=scorecard_data.get("key_opportunities", []) if isinstance(scorecard_data.get("key_opportunities"), list) else []
@@ -603,9 +601,9 @@ JSON Response:
             # Analysis Fields - extract text properly (not JSON)
             market_analysis=_extract_text_from_field(structured_data.get("market_analysis") or ""),
             team_insights=_extract_text_from_field(structured_data.get("team_insights") or ""),
-            competitive_landscape=_extract_text_from_field(structured_data.get("competitive_landscape") or ""),
+
             funding_info=structured_data.get("funding_info"),
-            news_mentions=structured_data.get("news_mentions", []),
+            news_mentions=structured_data.get("news_mentions", []) if isinstance(structured_data.get("news_mentions"), list) else [],
             social_presence=structured_data.get("social_presence"),
             technology_stack=_extract_text_from_field(structured_data.get("technology_stack") or ""),
             customer_base=_extract_text_from_field(structured_data.get("customer_base") or ""),

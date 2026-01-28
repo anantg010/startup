@@ -1,8 +1,3 @@
-"""
-Node 5: Analyze Competitors
-Researches and analyzes 5 competitors of the startup
-"""
-
 from ..state import GraphState, CompetitorAnalysis, Competitor
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
@@ -56,6 +51,12 @@ async def analyze_competitors_node(state: GraphState) -> dict:
         focus_market = research_findings.customer_base or "Not specified"
         known_competitors = ", ".join(research_findings.known_competitors) if research_findings.known_competitors else ""
         
+        # Extract Market Data for Validation
+        initial_tam = research_findings.tam
+        initial_sam = research_findings.sam
+        initial_som = research_findings.som
+        print(f"✓ Initial Market Data: TAM={initial_tam}, SAM={initial_sam}, SOM={initial_som}")
+        
         # Extract Tavily report for context
         tavily_report = ""
         raw_data = state.raw_gathering_data
@@ -104,13 +105,24 @@ Your task:
 4. Compare each competitor to the startup in focus
 5. Provide market overview and competitive analysis specific to the Indian context where applicable
 
+6. **MARKET DATA VALIDATION**:
+   - INPUT DATA PROVIDED: 
+     * TAM: {initial_tam}
+     * SAM: {initial_sam}
+     * SOM: {initial_som}
+   - Validate these numbers. **CRITICAL: ALL NUMBERS MUST BE INDIA-CENTRIC (INR).**
+   - **MANDATORY ESTIMATION**: If input numbers are missing, incorrect, or Global, YOU MUST ESTIMATE THE **INDIAN MARKET SIZE** (TAM/SAM/SOM) in INR.
+   - **DO NOT RETURN NULL**. You MUST provide a professional estimate based on the industry.
+   - ALWAYS provide numeric values for 'validated_market_data'.
+   - Provide **MAX 2 BRIEF BULLET POINTS** stating the **SOURCE** or **BASIS** of these numbers (e.g., "Based on Statista 2024 report", "Bottom-up estimate: 10M users x ₹500").
+
 For EACH of the 5 competitors, provide:
 - name: Company name
 - founded_year: Year founded (as integer)
 - headquarters: Location
-- funding_raised: Total funding in dollars (as number)
-- current_valuation: Current valuation in dollars (as number, or null if unknown)
-- revenue: Annual revenue in dollars (as number, or null if unknown)
+- funding_raised: Total funding in Indian Rupees (INR) (as number)
+- current_valuation: Current valuation in Indian Rupees (INR) (as number, or null if unknown)
+- revenue: Annual revenue in Indian Rupees (INR) (as number, or null if unknown)
 - business_model: How they make money
 - focus_market: Their target market
 - traction: Their growth metrics and traction
@@ -135,7 +147,13 @@ IMPORTANT: Return ONLY valid JSON with this exact structure:
   ],
   "market_overview": "Brief overview of the competitive landscape in {industry}",
   "competitive_advantages": "What makes {startup_name} different/better",
-  "market_threats": "Key threats and challenges in this market"
+  "market_threats": "Key threats and challenges in this market",
+  "validated_market_data": {{
+      "tam": 1000000000,
+      "sam": 500000000,
+      "som": 50000000,
+      "explanation": ["Bullet 1 explaining the numbers", "Bullet 2 explaining the growth"]
+  }}
 }}
 
 Be specific with numbers and factual. If exact data is unknown, provide realistic estimates based on industry knowledge.
@@ -164,7 +182,10 @@ Be specific with numbers and factual. If exact data is unknown, provide realisti
             "focus_market": focus_market,
             "known_competitors": known_competitors,
             "description": research_findings.description,
-            "tavily_context": tavily_report if tavily_report else "No deep research report available."
+            "tavily_context": tavily_report if tavily_report else "No deep research report available.",
+            "initial_tam": initial_tam,
+            "initial_sam": initial_sam,
+            "initial_som": initial_som
         })
         
         print("  ✓ LLM analysis completed")
@@ -186,20 +207,15 @@ Be specific with numbers and factual. If exact data is unknown, provide realisti
                 if start_idx != -1 and end_idx > start_idx:
                     json_str = llm_output[start_idx:end_idx]
                     competitor_data = json.loads(json_str)
-                else:
-                    competitor_data = {
-                        "competitors": [],
-                        "market_overview": "Unable to parse competitor data",
-                        "competitive_advantages": "",
-                        "market_threats": ""
-                    }
             except:
                 competitor_data = {
                     "competitors": [],
                     "market_overview": "Unable to parse competitor data",
                     "competitive_advantages": "",
-                    "market_threats": ""
+                    "market_threats": "",
+                    "validated_market_data": {}
                 }
+
         
         print("  ✓ Data parsed successfully")
         
@@ -233,12 +249,19 @@ Be specific with numbers and factual. If exact data is unknown, provide realisti
         # Step 7: Create CompetitorAnalysis object
         print("  Creating CompetitorAnalysis object...")
         
+        # Validate market data keys exist
+        validated_data = competitor_data.get("validated_market_data", {})
+        
         competitor_analysis = CompetitorAnalysis(
             startup_name=startup_name,
             competitors=competitors,
             market_overview=competitor_data.get("market_overview") or "",
             competitive_advantages=competitor_data.get("competitive_advantages") or "",
-            market_threats=competitor_data.get("market_threats") or ""
+            market_threats=competitor_data.get("market_threats") or "",
+            tam=validated_data.get("tam"),
+            sam=validated_data.get("sam"),
+            som=validated_data.get("som"),
+            market_data_explanation=validated_data.get("explanation", [])
         )
         
         print("  ✓ CompetitorAnalysis object created")

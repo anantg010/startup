@@ -175,7 +175,7 @@ class ResearchFindings(BaseModel):
     company_info: Dict = Field(default_factory=dict, description="Company background information")
     market_analysis: str = Field("", description="Market opportunity and size analysis")
     team_insights: str = Field("", description="Team background and experience analysis")
-    competitive_landscape: str = Field("", description="Competitors and competitive advantages")
+
     funding_info: Optional[Dict] = Field(None, description="Funding history and details")
     news_mentions: List[str] = Field(default_factory=list, description="Recent news articles")
     social_presence: Optional[Dict] = Field(None, description="Social media information")
@@ -250,6 +250,12 @@ class CompetitorAnalysis(BaseModel):
     market_overview: str = Field("", description="Overall market landscape and competitive position")
     competitive_advantages: str = Field("", description="What sets the focused startup apart")
     market_threats: str = Field("", description="Competitive threats and challenges")
+    
+    # Validated Market Data (from Competitor Analysis Node)
+    tam: Optional[float] = Field(None, description="Validated Total Addressable Market (INR)")
+    sam: Optional[float] = Field(None, description="Validated Serviceable Addressable Market (INR)")
+    som: Optional[float] = Field(None, description="Validated Serviceable Obtainable Market (INR)")
+    market_data_explanation: List[str] = Field(default_factory=list, description="Explanation for the validated market numbers")
 
 
 # ==================== Main Graph State ====================
