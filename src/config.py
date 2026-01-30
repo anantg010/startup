@@ -24,6 +24,9 @@ class Config:
     
     # ==================== Platform API Configuration ====================
     PLATFORM_API_KEY = os.getenv("PLATFORM_API_KEY")
+    PLATFORM_ORG_ID = os.getenv("PLATFORM_ORG_ID")
+    PLATFORM_PROGRAM_ID = os.getenv("PLATFORM_PROGRAM_ID")
+    PLATFORM_EVALUATION_STAGE_ID = os.getenv("PLATFORM_EVALUATION_STAGE_ID")
     
     # ==================== N8N Webhook Configuration ====================
     # Your N8N webhook URL for sending structured data

@@ -70,7 +70,7 @@ def upload_thesis_node(state: GraphState) -> dict:
         
         api_key = Config.PLATFORM_API_KEY
         headers = {
-            'x-api-key': api_key or '0lf+JP0Y6B9x4Ylt9ICprNhQ/p4='
+            'x-api-key': api_key
         }
         
         # open file in binary mode

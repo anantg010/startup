@@ -269,7 +269,7 @@ class GraphState(BaseModel):
     # ===== INPUT DATA =====
     startup_data: StartupData = Field(..., description="Input startup data from API")
     pitch_deck_text: Optional[str] = Field(None, description="Extracted text from pitch deck PDF")
-    pitch_deck_url: Optional[str] = Field(None, description="Google Drive URL for pitch deck")
+    pitch_deck_url: Optional[str] = Field(None, description="URL for pitch deck")
     pitch_deck_file_path: Optional[str] = Field(None, description="Local path to uploaded pitch deck file")
     
     # ===== RAW DATA GATHERING =====

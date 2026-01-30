@@ -58,7 +58,7 @@ def startup_creation_node(state: GraphState) -> dict:
         
         payload = {
             "status": "DRAFT",
-            "organizationId": "f4b25f02-bd02-4624-a7f7-855ed5d96d17",
+            "organizationId": Config.PLATFORM_ORG_ID,
             "evaluationStage": "APPLICATION_RECEIVED",
             "thesisId": thesis_id,
             "thesisName": thesis_name,
@@ -88,7 +88,7 @@ def startup_creation_node(state: GraphState) -> dict:
             print("⚠️ Method Config.PLATFORM_API_KEY is not set in .env")
         
         headers = {
-            'x-api-key': api_key or '0lf+JP0Y6B9x4Ylt9ICprNhQ/p4=', # Fallback if env missing
+            'x-api-key': api_key, # Fallback removed
             'Content-Type': 'application/json'
         }
         

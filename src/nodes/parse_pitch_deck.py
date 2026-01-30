@@ -33,20 +33,39 @@ async def parse_pitch_deck_node(state: GraphState) -> dict:
         pitch_deck_input_found = False
         
         # Case A: URL provided
+        # Case A: URL provided
         if state.pitch_deck_url and not state.pitch_deck_text:
             print(f"✓ Pitch deck URL found: {state.pitch_deck_url}")
-            from ..tools.google_drive import GoogleDriveDownloader
             import os
+            import requests # Import requests for direct download
             
             # Create temp directory ensuring it exists
             temp_dir = "temp_downloads"
             os.makedirs(temp_dir, exist_ok=True)
             output_path = os.path.join(temp_dir, "downloaded_pitch_deck.pdf")
             
-            print("  Downloading pitch deck from Drive...")
-            if GoogleDriveDownloader.download_file(state.pitch_deck_url, output_path):
-                print("  ✓ Download successful")
+            download_success = False
+            
+            # Direct download (e.g. Supabase, S3, etc.)
+            print("  Downloading pitch deck from URL...")
+            try:
+                # Basic header to mimic browser if needed, though often not needed for public signed URLs
+                # headers = {'User-Agent': 'Mozilla/5.0'} 
+                response = requests.get(state.pitch_deck_url, stream=True)
                 
+                if response.status_code == 200:
+                    with open(output_path, 'wb') as f:
+                        for chunk in response.iter_content(chunk_size=8192):
+                            if chunk:
+                                f.write(chunk)
+                    download_success = True
+                    print("  ✓ Download successful")
+                else:
+                    print(f"  ❌ Download failed with status: {response.status_code}")
+            except Exception as e:
+                print(f"  ❌ Download error: {str(e)}")
+
+            if download_success:
                 # Use PDFParser to split text
                 parser = PDFParser()
                 # Need to run async method
@@ -59,7 +78,7 @@ async def parse_pitch_deck_node(state: GraphState) -> dict:
                 else:
                     print(f"  ❌ Extraction failed: {result.get('error')}")
             else:
-                print("  ❌ Download failed")
+                print("  ❌ Download failed or file empty")
         
         # Case B: Text already provided
         elif state.pitch_deck_text:

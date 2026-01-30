@@ -77,8 +77,7 @@ async def research_startup(
     founded_year: Optional[int] = Form(None),
     location: Optional[str] = Form(None),
     ceo_linkedin_url: Optional[str] = Form(None),
-    google_drive_link: Optional[str] = Form(None),
-    pitch_deck: Optional[UploadFile] = File(None)
+    pitch_deck: Optional[str] = Form(None)
 ):
     try:
         print("\n" + "="*60)
@@ -88,51 +87,12 @@ async def research_startup(
         print(f"Industry: {industry}")
         print(f"Email: {email}")
         
-        # Step 1: Extract pitch deck if uploaded
-        pitch_deck_text = None
-        
-        if pitch_deck:
-            print(f"\n📄 Processing pitch deck: {pitch_deck.filename}")
-            try:
-                pdf_content = await pitch_deck.read()
-                print(f"   Pitch deck size: {len(pdf_content)} bytes")
-                
-                # Use PDFParser to extract text
-                parser = PDFParser()
-                parse_result = await parser.extract_text_from_bytes(pdf_content)
-                
-                if parse_result.get("success"):
-                    pitch_deck_text = parse_result.get("full_text", "")
-                    print(f"   ✓ Extracted {len(pitch_deck_text)} characters from PDF")
-                else:
-                    error = parse_result.get("error", "Unknown error")
-                    print(f"   ⚠️ Failed to parse PDF: {error}")
-                    # Continue without pitch deck
+        # Step 1: Handle pitch deck URL
+        # We now accept pitch_deck as a URL string directly
+        pitch_deck_url = pitch_deck
             
-            except Exception as e:
-                print(f"   ⚠️ Error processing pitch deck: {str(e)}")
-                # Continue without pitch deck
-        
-        elif google_drive_link:
-            print(f"\n🔗 Google Drive Link received: {google_drive_link}")
-            
-        # Extract pitch_deck path if saved
-        pitch_deck_path = None
-        if pitch_deck:
-             # Create uploads directory if not exists
-            upload_dir = "uploads"
-            if not os.path.exists(upload_dir):
-                os.makedirs(upload_dir)
-            
-            # Save file
-            file_path = f"{upload_dir}/{pitch_deck.filename}"
-            with open(file_path, "wb") as buffer:
-                # Reset cursor if read previously
-                await pitch_deck.seek(0)
-                buffer.write(await pitch_deck.read())
-            
-            pitch_deck_path = file_path
-            print(f"   ✓ Saved pitch deck to: {pitch_deck_path}")
+        if pitch_deck_url:
+            print(f"\n🔗 Pitch Deck Link received: {pitch_deck_url}")
         
         # Step 2: Create startup data
         print("\n📝 Creating startup data...")
@@ -159,9 +119,9 @@ async def research_startup(
         
         initial_state = GraphState(
             startup_data=startup_data,
-            pitch_deck_text=pitch_deck_text,
-            pitch_deck_url=google_drive_link,
-            pitch_deck_file_path=os.path.abspath(pitch_deck_path) if pitch_deck_path else None,
+            pitch_deck_text=None,  # Will be extracted in Node 1
+            pitch_deck_url=pitch_deck_url,
+            pitch_deck_file_path=None,
             status="initialized"
         )
         

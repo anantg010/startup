@@ -37,8 +37,8 @@ def startup_application_creation_node(state: GraphState) -> dict:
         startup_name = research_findings.name if research_findings else (state.startup_data.name if state.startup_data else "Unknown Startup")
         
         # Static IDs as requested
-        PROGRAM_ID = "ccb97619-3212-4e77-9bc2-f3bf2765c4a0"
-        EVALUATION_STAGE_ID = "3747539d-a0e0-4abb-8561-8e069d517159"
+        PROGRAM_ID = Config.PLATFORM_PROGRAM_ID
+        EVALUATION_STAGE_ID = Config.PLATFORM_EVALUATION_STAGE_ID
         STATUS = "SUBMITTED"
         
         # Prepare Payload
@@ -58,7 +58,7 @@ def startup_application_creation_node(state: GraphState) -> dict:
         
         api_key = Config.PLATFORM_API_KEY
         headers = {
-            'x-api-key': api_key or '0lf+JP0Y6B9x4Ylt9ICprNhQ/p4=',
+            'x-api-key': api_key,
             'Content-Type': 'application/json'
         }
         

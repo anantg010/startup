@@ -10,7 +10,7 @@ from .nodes.startup_creation import startup_creation_node
 from .nodes.startupApplication_creation import startup_application_creation_node
 from .nodes.startupApplication_creation import startup_application_creation_node
 from .nodes.upload_thesis import upload_thesis_node
-from .nodes.pitchDeck_upload import pitch_deck_upload_node
+
 
 def build_research_graph():
     """
@@ -88,8 +88,7 @@ def build_research_graph():
     graph.add_node("upload_thesis", upload_thesis_node)
     print("    ✓ Node 9: Upload Thesis added")
     
-    graph.add_node("pitch_deck_upload", pitch_deck_upload_node)
-    print("    ✓ Node 10: Pitch Deck Upload added")
+
     
     # Step 3: Connect nodes in sequence (linear flow)
     print("  Connecting nodes...")
@@ -118,11 +117,8 @@ def build_research_graph():
     graph.add_edge("startup_application_creation", "upload_thesis")
     print("    ✓ Connected: startup_application_creation → upload_thesis")
 
-    graph.add_edge("upload_thesis", "pitch_deck_upload")
-    print("    ✓ Connected: upload_thesis → pitch_deck_upload")
-
-    graph.add_edge("pitch_deck_upload", END)
-    print("    ✓ Connected: pitch_deck_upload → END")
+    graph.add_edge("upload_thesis", END)
+    print("    ✓ Connected: upload_thesis → END")
     
     # Step 4: Set entry point
     print("  Setting entry point...")
